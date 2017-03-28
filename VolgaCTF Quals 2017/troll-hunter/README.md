@@ -10,24 +10,24 @@
 
 ## The Entry Point
 
-Following provided link we could see a website that wanted to help the world to fight against internet trolles.
+Following provided link we could see a website created to help the world to fight against internet trolles.
 
-After a while, clicking on inputs and observing requests in Burp we find 2 entry points to the underlying API:
+After a while, clicking on the inputs and observing the requests in Burp we find 2 entry points to the underlying API:
 - quite strange way to get troll information using request to some kind of DB
 - input form that follows submitted IP and do some kind of checks
 
 ## Find The Troll
 
-All information about knonw trolls were retrieved using links like: 
+All information about known trolls were retrieved using links like: 
 
 `http://troll-hunter.quals.2017.volgactf.ru:9494/show?id=q=_id:1`
 
-Visiting the link directly we could see HTML-card with troll info and some interesting snippet of code that was commented out:
+Visiting the link directly we could see the HTML-card with troll info and some interesting snippet of the code that was commented out:
 ```html
 <!-- <article> <a href="http://mdomaradzki.deviantart.com/art/Bueller-III-351975087" class="image featured"><img src="images/pic01.jpg" alt=""></a> <header> <h3><a id="mylightbox" data-featherlight="#mylightbox" href="#">Pulvinar sagittis congue</a></h3> </header> <p>{"ip"=>"192.9.35.7", "name"=>"Anonymous", "img"=>"/images/troll5.png", "description"=>"Anonymous troll. Nobody knows his name"}</p> </article> -->
 ```
 
-After some fuzzing we knew that:
+After some fuzzing we figured out that:
 - We could find a troll using any paramter (**ip**, **name**, **img**, **description** and hidden **_id**)
 - Requests which could not find anything returns **"Problem with Connection"**
 - We could use multiple paramters in query string, like 
@@ -36,12 +36,12 @@ After some fuzzing we knew that:
 - We could use wildcards like `/show?id=q=fo*` and keywords **sort** and **from**
 - We could not retrieve anything useful from DB (except trolls that we've already seen)
 
-Using that info we found out that the actual backend proxies our request to the ElasticSearch. 
+Using that info we've found out that the actual backend proxies our request to the ElasticSearch. 
 `/show?id=` param is URI decoded and used as a query to [search uri](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html)
 
-So we got that have a full control over the query to the specific index of the ElasticSearch but couldn't do anything interesting enough.
+So we've had a full control over the query to the specific index of the ElasticSearch but couldn't do anything interesting enough.
 
-*(Writing that text riht now I think that we could try to exploit the target vuln using that functionality, but I can't check it, so let's follow our path)*
+*(Writing that text now I think we could try to exploit the target vuln using that functionality, but I can't check it, so let's follow our path)*
 
 ## Report Them All!
 
@@ -63,7 +63,7 @@ Host: 92.63.71.187:4041
 Aha! It's alive!
 
 So after a bit of tries we got that:
-- Bot ignores URI scheme, path and params and uses only provided host and port (all auth parts of URI are also ignored) to do `GET /` request
+- The bot ignores URI scheme, path and params and uses only provided host and port (all auth parts of URI are also ignored) to do `GET /` request
 - If we answer `200 OK` bot says *"Ok. We'll check this. Thank you!"*, if we send some `4xx` or `5xx` error bot says *"Sorry, we can't check this ip. Something wrong"*
 - **Bot follow redirects!** And morevover it uses provided location as is, so we have full control over request path and query string
 
@@ -73,10 +73,10 @@ Sending bot to the `http://localhost:9200/_cat/indices?v` we make sure that we c
 
 *Oh, no! Is it error-based blind elasticsearch injection? D:*
 
-At that moment we got much more access to the elastic REST API so we took a closer look to [its docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html) and found the following:
+At that moment we got much more access to the elastic REST API, so we took a closer look to [its docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html) and found the following:
 > The body content can also be passed as a REST parameter named source.
 
-So we could send request body via query argument `source` like:
+So we could send the request body via query argument `source` like:
 ```
     Location http://localhost:9200/_search?source={"query": {"match_all": { } } }
 ```
@@ -247,5 +247,3 @@ Flag: `VolgaCTF{troll_is_dead_now_we_win_the_battle}`
 Ofc our solution isn't optimal but it reflects our way to get the flag, so I believe that it can be useful.
 
 If you are sure that you can do it faster, we steal [app sources](./task) just btw, so you can try to pwn it by yourself.
-
-
