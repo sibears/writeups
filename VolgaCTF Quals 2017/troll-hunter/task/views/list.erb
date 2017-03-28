@@ -1,0 +1,230 @@
+<!-- <html>
+<h1> Hello to TrollTrace</h1>
+	Find  troll all over the world
+<br>	Result is : <%=:app%>
+<body>
+<form action="checkip" method="POST">
+<input type="text" name="ip">	
+<input type="submit" name="submit">
+</form>
+<br>
+<%if defined? ip %>
+<%=ip%>
+<br>
+data is <%=data%>
+<%
+	end 
+	%>
+</body>
+
+</html>
+
+ -->
+
+
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>TrollTrace</title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet" type="text/css" />
+		<!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
+		<script src="js/jquery.min.js"></script>
+<script src="js/featherlight.js" type="text/javascript" charset="utf-8">
+
+
+</script>
+		<script src="js/jquery.dropotron.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/skel-panels.min.js"></script>
+		<script src="js/init.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/js/toastr.js"></script>
+
+		<script type="text/javascript" src="js/lightcase.js"></script>
+<link href="css/featherlight.css" type="text/css" rel="stylesheet" />
+		<noscript>
+			<link href="css/featherlight.css" type="text/css" rel="stylesheet" />
+			<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.1/css/toastr.css" rel="stylesheet"/>
+			<link rel="stylesheet" href="css/skel-noscript.css" />
+			<link rel="stylesheet" href="css/style-desktop.css" />
+			<link rel="stylesheet" href="css/bootstrap.min.css" />
+			<link rel="stylesheet" href="css/style.css" />
+			<link rel="stylesheet" href="css/search.css" />
+			<link rel="stylesheet" href="css/style-noscript.css" />
+
+		</noscript>
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie8.css" /><![endif]-->
+	</head>
+	<script type='text/javascript'>
+	$(window).load(function(){
+	$("#checkip").click(function() {
+    // e.preventDefault();
+    $.ajax({
+
+        type: "POST",
+        url: "/checkip",
+        data: { 
+            ip: $("#ipinput").val() 
+        },
+        success: function(result) {
+          
+            console.log(result);
+    	document.getElementById('stateofp').innerHTML = result;
+
+
+        },
+        error: function(result) {
+            alert('error');
+        }
+    });
+});
+});
+
+ 
+</script>
+<!-- <button id="checkip">Check</button> -->
+	<body class="homepage">
+
+		<!-- Header -->
+			<div id="header">
+						
+				<!-- Inner -->
+					<div class="inner">
+						<header>
+							<h1><a href="#" id="logo">TrollTrace</a></h1>
+							<hr />
+							<span class="byline">way to the clear internet</span>
+						</header>
+						<footer>
+							<a href="#banner" class="button circled scrolly">Ready</a>
+						</footer>
+					</div>
+				
+				<!-- Nav -->
+					<nav id="nav">
+						<ul>
+							<li><a href="index.html">Home</a></li>
+				<!-- 			<li>
+								<span>Menu</span>
+								<ul>
+									<li><a href="#">Lorem ipsum dolor</a></li>
+									<li><a href="#">Magna phasellus</a></li>
+									<li><a href="#">Etiam dolore nisl</a></li>
+									<li>
+										<span>And a submenu &hellip;</span>
+										<ul>
+											<li><a href="#">Lorem ipsum dolor</a></li>
+											<li><a href="#">Phasellus consequat</a></li>
+											<li><a href="#">Magna phasellus</a></li>
+											<li><a href="#">Etiam dolore nisl</a></li>
+										</ul>
+									</li>
+									<li><a href="#">Veroeros feugiat</a></li>
+								</ul>
+							</li> -->
+								</ul>
+					</nav>
+
+			</div>
+			
+		<!-- Banner -->
+			<div id="banner">
+				<h2>Hi. You're looking at <strong>TrollTrace</strong></h2>
+				<span class="byline">
+					Tommorow is coming and we able to make our life better. TrollTrace search and store information about disgusting troll all over the world. Help us find out a troll in the web. Just bring us suspicious ip and our moderators will check this out. Would you help us? The same enthusiasts like you already found some of the trolls. Just See below.
+				</span>
+			</div>
+
+
+		<!-- Carousel -->
+			<div class="carousel">
+				<div class="reel">
+					 <% data.each do |troll| %>
+					
+					<article >
+						<a href="/show?id=q=_id:<%=troll['_id']%>"   data-featherlight="iframe" data-featherlight-iframe-allowfullscreen="true" data-featherlight-iframe-width="230" data-featherlight-iframe-height="520"   class="image featured"><img src="<%=troll['_source']['img'] if defined?(troll['_source']['img']) %>" alt="" /></a>
+						<header>
+							<h3><a id="mylightbox" data-featherlight="#mylightbox" href="#"><%=troll['_source']['name']%> : <%=troll['_source']['ip']%></a></h3>
+						</header>
+						<p><%=troll['_source']['description']%></p>							
+					</article>
+
+
+					<% end %>
+					
+				</div>
+			</div>
+			
+		<!-- Main -->
+			<div class="wrapper style2">
+
+
+				<article id="main" class="container special">
+					<a href="#" class="image featured"><img src="images/kitty.jpg" alt="" /></a>
+					<header>
+						<h2><a href="#">Save our planet</a></h2>
+						<span class="byline">
+							Everytime troll screw somebody OR do disgusting thing the little kitty starts to cry... Help us find out a troll in the web. Just bring us suspicious ip adress and our moderators will check this out
+						</span>
+					</header>
+					<p>
+				
+					</p>
+					<footer>
+
+					<input type="text" id="ipinput" class="search-query mac-style" placeholder="http://192.168.14.13">
+					<br>
+						<!-- <a href="#" class="button">Check</a> -->
+						<button class="button" id="checkip">Check</button>
+						<br>
+						<span  id="stateofp"></span>
+						
+					</footer>
+				</article>
+
+			</div>
+
+
+		
+		<!-- Footer -->
+			<div id="footer">
+				<div class="container">
+					
+					<div class="row">
+						<div class="12u">
+							
+							<!-- Contact -->
+								<section class="contact">
+									<header>
+										<h3>Want to donate us?</h3>
+									</header>
+									<p>Just connect with us by any social network.</p>
+									<ul class="icons">
+										<li><a href="#" class="fa fa-twitter solo"><span>Twitter</span></a></li>
+										<li><a href="#" class="fa fa-facebook solo"><span>Facebook</span></a></li>
+										<li><a href="#" class="fa fa-google-plus solo"><span>Google+</span></a></li>
+										<li><a href="#" class="fa fa-pinterest solo"><span>Pinterest</span></a></li>
+										<li><a href="#" class="fa fa-dribbble solo"><span>Dribbble</span></a></li>
+										<li><a href="#" class="fa fa-linkedin solo"><span>Linkedin</span></a></li>
+									</ul>
+								</section>
+							
+							<!-- Copyright -->
+								<div class="copyright">
+									<ul class="menu">
+										<li>&copy; TrollTrace. All rights reserved.</li>
+																			</ul>
+								</div>
+							
+						</div>
+					
+					</div>
+				</div>
+			</div>
+
+	</body>
+</html>
