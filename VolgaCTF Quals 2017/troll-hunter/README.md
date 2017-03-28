@@ -1,4 +1,4 @@
-# VolgaCTF Quals 2017 
+# VolgaCTF Quals 2017 -- Troll Hunter
 **Category**: Web
 
 **Description**:
