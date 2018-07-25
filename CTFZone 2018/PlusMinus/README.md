@@ -30,7 +30,7 @@ it if it's nearly equal to needed value of expression, otherwise return None.
 
 ### Movements
 Valid movements: `['+', '-', '\*', '/', '(', "POP"]`. They describes what can we
-do at this point of solving. There's no ')' because it isn't regular case, we
+do at this point of solving. There's no `)` because it isn't regular case, we
 decide to put it basing on count of unclosed parenthesis. `POP` indicates we
 can pop num from stack and put it at the end of solution.
 
