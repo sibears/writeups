@@ -32,8 +32,8 @@
 # Writeup
 
 ## Googling
-To get the flag you firstly need to find genom sequence of H5N1 virus. Unfortunately,
-there're a lot of variation of this virus, and HW306977 hasn't been indexed by google.
+To get the flag you first need to find genom sequence of H5N1 virus. Unfortunately,
+there are lots of variants of this virus, and HW306977 hasn't been indexed by google.
 
 So it took some time to find data archive of biology things, and here we found
 a [record about HW306977](https://www.ncbi.nlm.nih.gov/nuccore/HW306977).
@@ -42,22 +42,20 @@ a [record about HW306977](https://www.ncbi.nlm.nih.gov/nuccore/HW306977).
 ### Method
 The task is typical for [dynamic programming](https://en.wikipedia.org/wiki/Dynamic_programming). 
 
-We have a whole sequence and hashmap sample_seq -> sample_ind, lets write a recursive function
+We have a target sequence and hashmap sample_seq -> sample_ind, lets write a recursive function
 that returns the smallest sequence of samples (only theirs ids) for some suffix of the
 sequence: `f(suffix)`.
 
 ### Cache
-The most important thing in dynamic programming is caching result of `f(..)`. If you do your
-algorithm is fast enough, if you don't it's polynomial asymptotic.
+The most important thing in dynamic programming is caching result of `f(..)`. If you can cache them,
+your algorithm will be fast enoughh, if you don't it's polynomial asymptotic.
 
 ### Base case
 If the suffix is empty, then the answer is obvious: `[]`.
 
 ### Body of recursion
-After base case was checked, check that this prefix hasn't computed yet.
-If it has, return the cached answer. If it hasn't, do this:
-
-Now we just doing this:
+After base case was checked, check that this prefix wasn't computed yet.
+If it was, return the cached answer. If it wasn't, do this:
 
 ```python
 def f(suffix):
