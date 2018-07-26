@@ -21,8 +21,8 @@ It's a good idea to walk through all commands and put some debug information
 into them like this:
 ```
 def __command_xor(self,amplifier):
-		inreg=amplifier&0xf
-		outreg=amplifier>>4
+    inreg=amplifier&0xf
+    outreg=amplifier>>4
     stderr.print("xor %s %s\n" % (self.reg_names[inreg], self,reg_names[outreg]))
     #first define reg_names similarly to dataregs
 ```
