@@ -74,7 +74,7 @@ the other bytes are already there and are not printable.
 The shellcode will be something like this: we load the required values into eax
 and ebx xorred with some printable string so that we get another printable
 string. We then load the xor-string into ecx, xor ecx with eax and ebx, and
-call the flagcall. The values we take are, for example the following:
+call the flagcall. The values we take are, for example, the following:
 ```
 xorchar = chr(0b1000000)
 xorord = ord(xorchar)
