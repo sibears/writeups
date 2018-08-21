@@ -48,5 +48,5 @@ When you upload the binary to disassembler you can notice from the `main` functi
 ```
 Recently I have read an article with a similar case. I liked the solution where was used z3 and I've decided to write something like this for the task.
 
-[The script](link)  
+[The script](./solver.py)  
 [The article](http://0xeb.net/2018/03/using-z3-with-ida-to-simplify-arithmetic-operations-in-functions/)
