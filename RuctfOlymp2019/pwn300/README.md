@@ -33,6 +33,6 @@ Thus we can overwrite the pointer to string2 and gain arbitrary write. Things we
  - With the first input_read overwrite the least byte of string2 pointer to null, so it makes string2 pointer to point in the middle of our string1 buffer
  - With the second input_read overwrite the whole string2 pointer to address of something you want to read, in this case it would .got.plt
 
- With arbitrary read and write and given `libc.so` the file we can leak `libc_base` address and then overwrite `strlen` to `system`. And last but not least - as we overwrote strlen to the system it would probably be called with string pointed somewhere in `.got.plt` so it would return -1 or something, in this case we wouldn't pass length check so that's why we need to overwrite `exit` to something dummy.
+ With arbitrary read and write and given `libc.so` file we can leak `libc_base` address and then overwrite `strlen` to `system`. And last but not least - as we overwrote strlen to the system it would probably be called with string pointed somewhere in `.got.plt` so it would return -1 or something, in this case we wouldn't pass length check so that's why we need to overwrite `exit` to something dummy.
 
  Here is my [exploit](./spl.py).
