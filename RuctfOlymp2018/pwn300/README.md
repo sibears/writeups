@@ -2,10 +2,10 @@
 In this task we are given a x86\_64 ELF binary and libc.
 
 ### TL;DR
-- Overwrite got.plt.rand to main address
+- Overwrite `got.plt.rand` to main address
 - Overwrite least byte of string pointer in heap to get control of pointer itself then leak address of libc functions
-- Overwrite got.plt.exit to simple return gadget
-- Overwrite got.plt.strlen to system
+- Overwrite `got.plt.exit` to simple return gadget
+- Overwrite `got.plt.strlen` to `system`
 
  
  Logic of task is pretty simple - read two strings which buffers is allocated on heap, then ask the user to guess 10 random numbers (this part of binary mostly useless).
