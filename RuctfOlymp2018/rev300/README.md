@@ -1,7 +1,7 @@
 # Carolus Magnus (rev300)
 
-In this task we are given simple nolibc binary written on pure asm.
-First of all, once you opened the binary in your favorite disassembler you can spot that the binary have a lot of encrypted functions, and it's decrypt them on runtime due flag checking. Well im lazy to write a lot of code so i decided just to run the binary under gdb wait until the binary is decrypt itself and then dump the encrypted memory:
+In this task we are given simple nolibc binary written in pure asm.
+First of all, once you opened the binary in your favorite disassembler you can spot that the binary has a lot of encrypted functions, and it's decrypt them on runtime due to flag checking. Well, I'm lazy to write a lot of code so I decided just to run the binary under gdb wait until the binary is decrypting itself and then dump the encrypted memory:
 ```
 b *0x8048136
 r
@@ -21,11 +21,11 @@ mov eax, CONST1
 mov ebx, CONST2
 ret
 ```
-Checking logic is simple:
+Logic checking is simple:
 - Make few substructions of flag bytes from accumulators values (like this ACCS[i] - flag[i0] * x0 - flag[i1] * x1 - flag[i2] * x2 etc. )
-- Check if after all of substructions all the accs values is equal to zero
+- Check if after all of the substructions all the accs values is equal to zero
 
-Well it's pretty simple linear equation system and can be easily solved by matrix method via sagemath or numpy. But i decided to solve it via z3.
+Well it's pretty simple linear equation system and can be easily solved by matrix method via sagemath or numpy. But I decided to solve it via z3.
 
 Here is my z3 [solver](./solver.py).
 
