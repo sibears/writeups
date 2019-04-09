@@ -21,7 +21,7 @@ mov eax, CONST1
 mov ebx, CONST2
 ret
 ```
-Logic checking is simple:
+Logic of checking the flag is simple:
 - Make few substructions of flag bytes from accumulators values (like this ACCS[i] - flag[i0] * x0 - flag[i1] * x1 - flag[i2] * x2 etc. )
 - Check if after all of the substructions all the accs values is equal to zero
 
