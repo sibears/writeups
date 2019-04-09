@@ -27,5 +27,6 @@ Checking logic is simple:
 
 Well it's pretty simple linear equation system and can be easily solved by matrix method via sagemath or numpy. But i decided to solve it via z3.
 
-Here is my z3 (solver)[./solver.py]
-Here is my (helper script) for patching bytes of decrypted functions and extract offsets from assembly.
+Here is my z3 [solver](./solver.py).
+
+Here is my [helper script](./helper.py) for patching bytes of decrypted functions and extract offsets from assembly.
